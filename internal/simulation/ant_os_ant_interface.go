@@ -86,7 +86,7 @@ func (a *AntOS) TakeSugar(sugar ant.Sugar) error {
 		return fmt.Errorf("ant is not near the sugar")
 	}
 	// log.Printf("Ant #%d takes sugar\n", a.GetId())
-	a.CurrentSugarLoad += sugar.(*Sugar).GetLoad(a.maxLoad - a.CurrentSugarLoad)
+	a.CurrentSugarLoad += sugar.(*Sugar).GetLoad(int(a.Load) - a.CurrentSugarLoad)
 	return nil
 }
 
@@ -100,8 +100,8 @@ func (a *AntOS) GotToAntHill() {
 }
 
 func (a *AntOS) SetMark(radius, information int) {
-	if a.Lifespan >= a.SetMarkResetTime {
-		a.SetMarkResetTime = a.Lifespan + a.SetMarkThreshold
+	if a.Range >= a.SetMarkResetTime {
+		a.SetMarkResetTime = a.Range + a.SetMarkThreshold
 		a.simulation.AddMarkingAtPosition(a.GetPosition(), radius, information)
 	}
 }

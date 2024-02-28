@@ -67,7 +67,7 @@ func (a *AntOSMoving) rotate(os *AntOS) {
 		directionDifference -= 360
 	}
 
-	rotationSpeed := 8.0
+	rotationSpeed := float64(os.Rotation)
 	if math.Abs(directionDifference) < rotationSpeed {
 		os.CurrentDirection = *a.TargetDirection
 		a.TargetDirection = nil // Stop rotating
@@ -93,7 +93,7 @@ func (a *AntOSMoving) move(os *AntOS) {
 		return
 	}
 
-	speed := 3.0
+	speed := float64(os.Speed)
 	if os.CurrentSugarLoad > 0 {
 		// Ant is carrying sugar, reduce speed
 		speed /= 2.0

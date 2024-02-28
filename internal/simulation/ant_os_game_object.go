@@ -27,14 +27,18 @@ import (
 )
 
 func (a *AntOS) Update() {
-	a.Lifespan++
+	a.Range++
 	if a.State != nil {
 		a.State.Update(a)
 	} else {
-		a.ant.Waits()
+		if waitAnt, ok := a.ant.(interface{ Waits() }); ok {
+			waitAnt.Waits()
+		}
 	}
 	a.AnimatedSprite.Update()
-	a.ant.Tick()
+	if tickAnt, ok := a.ant.(interface{ Tick() }); ok {
+		tickAnt.Tick()
+	}
 }
 
 func (a *AntOS) Draw(screen *ebiten.Image) {
@@ -45,11 +49,11 @@ func (a *AntOS) Draw(screen *ebiten.Image) {
 		a.AnimatedSprite.CurrentAnimation = 0
 	}
 	img := a.AnimatedSprite.Draw()
-	// if a.sightDistanceImage != nil {
+	// if a.visionImage != nil {
 	// 	op := &ebiten.DrawImageOptions{}
 	// 	// halfSigthDistance := a.sightDistance / 2
-	// 	op.GeoM.Translate(a.Position.X()-a.sightDistance, a.Position.Y()-a.sightDistance)
-	// 	screen.DrawImage(a.sightDistanceImage, op)
+	// 	op.GeoM.Translate(a.Position.X()-float64(a.Vision), a.Position.Y()-float64(a.Vision))
+	// 	screen.DrawImage(a.visionImage, op)
 	// }
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(a.AnimatedSprite.GetCenteredRotationOffset())

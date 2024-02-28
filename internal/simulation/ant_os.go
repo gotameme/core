@@ -19,10 +19,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+
 package simulation
 
 import (
-	"github.com/gotameme/core/ant"
 	"github.com/gotameme/core/internal/helper"
 	"github.com/gotameme/core/internal/resources"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -35,12 +35,6 @@ var autoAntID int
 type AntOptions func(*AntOS)
 
 type AntOSConstructor func(AntOptions) *AntOS
-
-func WithSightDistance(distance float64) AntOptions {
-	return func(a *AntOS) {
-		a.sightDistance = distance
-	}
-}
 
 func WithPosition(x, y float64) AntOptions {
 	return func(a *AntOS) {
@@ -55,24 +49,30 @@ func WithAntHill(antHill *AntHill) AntOptions {
 	}
 }
 
+func WithRole(role string, properties Properties) AntOptions {
+	return func(a *AntOS) {
+		a.role = role
+		a.Properties = properties
+	}
+}
+
 type AntOS struct {
 	id         int
+	role       string
 	simulation *Simulation
 	resources.AnimatedSprite
-	ant ant.Ant
+	ant interface{}
 
 	antHill *AntHill
 	Target  interface{}
 
-	sightDistance      float64
-	sightDistanceImage *ebiten.Image
-	maxLoad            int
+	visionImage *ebiten.Image
 
 	CurrentDirection float64 // in degrees
 	State            AntOSState
 	CurrentSugarLoad int
 
-	Lifespan int
+	Properties
 
 	SetMarkThreshold int
 	SetMarkResetTime int
@@ -81,12 +81,10 @@ type AntOS struct {
 func NewAntOS(simulation *Simulation, options ...AntOptions) *AntOS {
 	autoAntID++
 	antOS := &AntOS{
-		id:             autoAntID,
-		simulation:     simulation,
-		AnimatedSprite: resources.NewAnimatedAnt(simulation.screenWidth, simulation.screenHeight),
-
-		sightDistance:    60, // default value
-		maxLoad:          5,  // default value
+		id:               autoAntID,
+		simulation:       simulation,
+		AnimatedSprite:   resources.NewAnimatedAnt(simulation.screenWidth, simulation.screenHeight),
+		Properties:       simulation.defaultRoleProperties,
 		SetMarkThreshold: 10, // in ticks
 	}
 
@@ -94,12 +92,12 @@ func NewAntOS(simulation *Simulation, options ...AntOptions) *AntOS {
 		option(antOS)
 	}
 
-	antOS.sightDistanceImage = helper.NewCircle(int(antOS.sightDistance), color.RGBA{R: 128, G: 0, B: 0, A: 255})
+	antOS.visionImage = helper.NewCircle(int(antOS.Vision), color.RGBA{R: 128, G: 0, B: 0, A: 255})
 
 	return antOS
 }
 
-func (a *AntOS) Init(ant ant.Ant) {
+func (a *AntOS) Init(ant interface{}) {
 	a.ant = ant
 }
 

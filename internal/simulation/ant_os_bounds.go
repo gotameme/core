@@ -22,12 +22,14 @@ THE SOFTWARE.
 package simulation
 
 import (
+	"github.com/gotameme/core/ant"
 	gmath "github.com/gotameme/core/internal/math"
 	"math"
+	"reflect"
 )
 
 func (a *AntOS) sightBox() ([2]float64, [2]float64) {
-	return gmath.NewCircle(a.Position[0], a.Position[1], a.sightDistance).ToBox()
+	return gmath.NewCircle(a.Position[0], a.Position[1], float64(a.Vision)).ToBox()
 }
 
 func (a *AntOS) bounds() ([2]float64, [2]float64) {
@@ -47,19 +49,26 @@ func (a *AntOS) See() ([2]float64, [2]float64, SearchIter) {
 			return true
 		}
 		switch data.(type) {
-		// case *AntOS:
+		case *AntOS:
+			if reflect.TypeOf(a.ant) == reflect.TypeOf(data.(*AntOS).ant) {
+				if seeAnt, ok := a.ant.(interface{ SeeFriend(interface{}) }); ok {
+					seeAnt.SeeFriend(data.(*AntOS).ant)
+				}
+			}
 		// 	// println("See: ", data.(*AntOS).Name)
 		// 	// log.Printf("#%d see AntOS #%d", a.GetId(), data.(*AntOS).GetId())
 		// case *AntHill:
 		// 	// Do nothing
 		case *Sugar:
-			sugar := data.(*Sugar)
-			// do not see sugar if empty
-			if sugar.CurrentSugar <= 0 {
-				return true
-			}
-			if distance(a.Position, sugar.Position) <= a.sightDistance && a.Target != sugar {
-				a.ant.SeeSugar(sugar)
+			if sugarAnt, ok := a.ant.(interface{ SeeSugar(ant.Sugar) }); ok {
+				sugar := data.(*Sugar)
+				// do not see sugar if empty
+				if sugar.CurrentSugar <= 0 {
+					return true
+				}
+				if distance(a.Position, sugar.Position) <= float64(a.Vision) && a.Target != sugar {
+					sugarAnt.SeeSugar(sugar)
+				}
 			}
 			// case *Marking:
 			// 	if int(distance(a.Position, data.(*Marking).Position)) > data.(*Marking).Radius {
@@ -91,11 +100,15 @@ func (a *AntOS) Smell() ([2]float64, [2]float64, SearchIter) {
 		// case *Sugar:
 		// 	// Do nothing
 		case *Marking:
-			if MarkCache.HasMark(a, data.(*Marking)) {
-				return true
+			if markAnt, ok := a.ant.(interface{ SeeMark(mark ant.Mark) }); ok {
+				if MarkCache.HasMark(a, data.(*Marking)) {
+					return true
+				}
+				MarkCache.AddMark(a, data.(*Marking))
+				markAnt.SeeMark(data.(*Marking))
+				// stop searching if ant saw a marking
+				// return false
 			}
-			MarkCache.AddMark(a, data.(*Marking))
-			a.ant.SeeMark(data.(*Marking))
 			// default:
 			// 	// log.Printf("See something unknown %T", data)
 		}
@@ -118,7 +131,9 @@ func (a *AntOS) Collides() ([2]float64, [2]float64, SearchIter) {
 				data.(*AntHill).CurrentSugar += a.CurrentSugarLoad
 				a.CurrentSugarLoad = 0
 			case *Sugar:
-				a.ant.ReachedSugar(data.(*Sugar))
+				if sugarAnt, ok := a.ant.(interface{ ReachedSugar(sugar ant.Sugar) }); ok {
+					sugarAnt.ReachedSugar(data.(*Sugar))
+				}
 				// default:
 				// 	log.Println("See something unknown")
 			}
