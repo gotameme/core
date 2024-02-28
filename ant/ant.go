@@ -30,4 +30,4 @@ type Ant interface {
 	Tick()
 }
 
-type AntConstructor func(AntOs) Ant
+type AntConstructor func(AntOs) interface{}
