@@ -127,4 +127,17 @@ func WithAntConstructor(antConstructor ant.AntConstructor) Option {
 	}
 }
 
+func WithRoles(roles ant.Roles, chooseRole ant.ChooseRole) (Option, error) {
+	roleProperties := make(map[string]simulation.Properties)
+	for roleName, role := range roles {
+		if !role.IsValid() {
+			return nil, fmt.Errorf("role %s is not valid - sum of properties must be zero", roleName)
+		}
+		roleProperties[roleName] = simulation.ApplyAntRole(100, role)
+	}
+	return func(cnf *Configuration) {
+		simulation.WithRoles(roleProperties, chooseRole)(&cnf.GameConfiguration.SimulationConfig)
+	}, nil
+}
+
 // endregion
