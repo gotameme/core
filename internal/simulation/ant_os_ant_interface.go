@@ -33,6 +33,10 @@ func (a *AntOS) GetId() int {
 	return a.id
 }
 
+func (a *AntOS) GetRole() string {
+	return a.role
+}
+
 func (a *AntOS) GetCurrentLoad() int {
 	return a.CurrentSugarLoad
 }

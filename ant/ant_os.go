@@ -23,6 +23,7 @@ package ant
 
 type AntOs interface {
 	GetId() int
+	GetRole() string
 	GetCurrentLoad() int
 	GetDirectionToSugar(sugar Sugar) int
 	GoForwards()
