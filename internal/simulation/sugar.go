@@ -89,7 +89,7 @@ func (s *Sugar) Draw(screen *ebiten.Image) {
 
 func (s *Sugar) GetLoad(i int) int {
 	if i > s.CurrentSugar {
-
+		s.CurrentSugar = 0
 		return s.CurrentSugar
 	}
 	s.CurrentSugar -= i
