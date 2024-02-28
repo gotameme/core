@@ -13,6 +13,14 @@ capable of performing basic tasks such as collecting sugar and utilizing markers
 - **Basic Ant Behavior:** Ants can navigate their environment to collect sugar and return it to their nest. They are
   also capable of setting markers containing information, facilitating communication among themselves. This forms a
   simple yet compelling challenge that captures the essence of what made Ant!Me! so intriguing.
+- **Advanced Ant Behavior and Dynamic Role Assignment:** Ants can now navigate their environment more effectively, with
+  enhanced behaviors enabled by dynamic role assignment. This allows for more complex scenarios and interactions within
+  the simulation.
+
+### Role Implementation:
+
+Added new structures and functionalities to support diverse ant roles within the simulation, including adjustments for
+speed, rotation, load, vision, and more.
 
 ## Planned Objectives
 
