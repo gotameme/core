@@ -48,7 +48,7 @@ func NewMarking(simulation *Simulation, position orb.Point, radius int, informat
 	// 	Position:    position,
 	// 	Radius:      radius,
 	// 	Information: information,
-	// 	Lifespan:    150, // ticks
+	// 	Range:    150, // ticks
 	// }
 	m := GetMarking()
 	m.simulation = simulation

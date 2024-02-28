@@ -23,7 +23,6 @@ package simulation
 
 import (
 	"fmt"
-	"github.com/gotameme/core/ant"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/paulmach/orb"
@@ -39,6 +38,7 @@ type Simulation struct {
 	removeMarkingQueue        []*Marking
 	queueMutex                sync.Mutex
 
+	RolesCount map[string]int
 	SimulationConfig
 
 	antHill *AntHill
@@ -60,6 +60,7 @@ func NewSimulation(screenWidth, screenHeight int, cnf SimulationConfig) *Simulat
 		apple:            apple,
 		rtree:            &rTree,
 		SimulationConfig: cnf,
+		RolesCount:       make(map[string]int),
 	}
 
 	return simulation
@@ -158,8 +159,15 @@ func (s *Simulation) Layout(_, _ int) (int, int) {
 }
 
 func (s *Simulation) AddNewAnt() {
-	antOS := NewAntOS(s, WithAntHill(s.antHill))
-	newAnt := s.antConstructor(antOS).(ant.Ant)
+	roleName := s.chooseRole(s.RolesCount)
+	antProperties := s.defaultRoleProperties
+	if properties, ok := s.roles[roleName]; ok {
+		antProperties = properties
+		s.RolesCount[roleName]++
+	}
+	antOS := NewAntOS(s, WithAntHill(s.antHill), WithRole(roleName, antProperties))
+
+	newAnt := s.antConstructor(antOS)
 	antOS.Init(newAnt)
 
 	s.ants = append(s.ants, antOS)

@@ -24,18 +24,31 @@ package simulation
 import "github.com/gotameme/core/ant"
 
 type SimulationConfig struct {
-	antDesiredValue   int
+	// antDesiredValue defines how many ants should be in the simulation simultaneously
+	antDesiredValue int
+	// sugarDesiredValue defines how many sugar should be in the simulation simultaneously
 	sugarDesiredValue int
-	antConstructor    ant.AntConstructor
+	// antConstructor is a function that creates a new ant
+	antConstructor ant.AntConstructor
+	// chooseRole is a function that determines the role of an ant
+	chooseRole ant.ChooseRole
+	// roles is a map of roles and their properties
+	roles                 map[string]Properties
+	defaultRoleProperties Properties
 }
 
 func NewSimulationConfig(options ...SimulationOptions) *SimulationConfig {
 	s := &SimulationConfig{
 		antDesiredValue:   100,
 		sugarDesiredValue: 1,
-		antConstructor: func(os ant.AntOs) ant.Ant {
-			return &ant.UnimplementedAnt{}
+		antConstructor: func(os ant.AntOs) interface{} {
+			return &struct{}{}
 		},
+		chooseRole: func(rolesCount ant.RolesCount) string {
+			return ""
+		},
+		// TODO: We need the real default range, which is half the diagonal of the field
+		defaultRoleProperties: NewDefaultProperties(100),
 	}
 
 	for _, o := range options {
@@ -62,5 +75,12 @@ func WithSugarDesiredValue(desiredValue int) SimulationOptions {
 func WithAntConstructor(antConstructor ant.AntConstructor) SimulationOptions {
 	return func(s *SimulationConfig) {
 		s.antConstructor = antConstructor
+	}
+}
+
+func WithRoles(roles map[string]Properties, chooseRole ant.ChooseRole) SimulationOptions {
+	return func(s *SimulationConfig) {
+		s.roles = roles
+		s.chooseRole = chooseRole
 	}
 }
