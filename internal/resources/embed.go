@@ -31,14 +31,11 @@ import (
 )
 
 var (
-	//go:embed ant.png
-	Ant3Images_png []byte
+	//go:embed ant_simple.png
+	AntSimpleSprites_png []byte
 
 	//go:embed arrow.png
 	Arrow_png []byte
-
-	//go:embed sugar.png
-	Sugar_png []byte
 
 	//go:embed sugar_sprite.png
 	Sugar2_png []byte
@@ -55,14 +52,14 @@ var (
 
 func NewAnimatedAnt(screenWidth, screenHeight int) AnimatedSprite {
 	return newAnimatedSprite(
-		DecodeEbitenImage(Ant3Images_png),
+		DecodeEbitenImage(AntSimpleSprites_png),
 		screenWidth,
 		screenHeight,
-		12,
-		3,
+		8,
+		4,
 		[]Animation{
-			{0, 0, 12},
-			{0, 3, 12},
+			{0, 0, 2},
+			{0, 4, 2},
 		},
 		1,
 	)
