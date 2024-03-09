@@ -19,23 +19,26 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+
 package simulation
 
 import (
 	"fmt"
+	"image/color"
+	"sync"
+
+	dll "github.com/emirpasic/gods/v2/lists/doublylinkedlist"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/paulmach/orb"
 	"github.com/tidwall/rtree"
-	"image/color"
-	"sync"
 )
 
 type Simulation struct {
 	screenWidth, screenHeight int
 	rtree                     *rtree.RTreeG[GameObject]
 	addMarkingQueue           []*Marking
-	removeMarkingQueue        []*Marking
+	removeMarkingQueue        map[*Marking]struct{}
 	queueMutex                sync.Mutex
 
 	RolesCount map[string]int
@@ -43,9 +46,9 @@ type Simulation struct {
 
 	antHill *AntHill
 	apple   *Apple
-	ants    []*AntOS
-	marks   []*Marking
-	sugar   []*Sugar
+	ants    *dll.List[*AntOS]
+	marks   *dll.List[*Marking]
+	sugar   *dll.List[*Sugar]
 }
 
 func NewSimulation(screenWidth, screenHeight int, cnf SimulationConfig) *Simulation {
@@ -54,6 +57,9 @@ func NewSimulation(screenWidth, screenHeight int, cnf SimulationConfig) *Simulat
 	var apple = NewRandomApple(screenWidth, screenHeight, 30)
 	rTree.Insert(antHill.Bounds())
 	simulation := &Simulation{
+		ants:             dll.New[*AntOS](),
+		marks:            dll.New[*Marking](),
+		sugar:            dll.New[*Sugar](),
 		screenWidth:      screenWidth,
 		screenHeight:     screenHeight,
 		antHill:          antHill,
@@ -67,24 +73,24 @@ func NewSimulation(screenWidth, screenHeight int, cnf SimulationConfig) *Simulat
 }
 
 func (s *Simulation) Update() error {
-	if len(s.ants) < s.antDesiredValue {
-		for i := 0; i < s.antDesiredValue-len(s.ants); i++ {
+	if s.ants.Size() < s.antDesiredValue {
+		for i := 0; i < s.antDesiredValue-s.ants.Size(); i++ {
 			s.AddNewAnt()
 		}
 	}
-
-	if len(s.sugar) < s.sugarDesiredValue {
-		for i := 0; i < s.sugarDesiredValue-len(s.sugar); i++ {
+	if s.sugar.Size() < s.sugarDesiredValue {
+		for i := 0; i < s.sugarDesiredValue-s.sugar.Size(); i++ {
 			sugar := NewRandomSugar(s, 30)
 			newMin, newMax, _ := sugar.Bounds()
 			s.rtree.Insert(newMin, newMax, sugar)
-			s.sugar = append(s.sugar, sugar)
+			s.sugar.Append(sugar)
 		}
 	}
+
 	wg := sync.WaitGroup{}
-	wg.Add(len(s.ants))
+	wg.Add(s.ants.Size())
 	mu := sync.Mutex{}
-	for _, antOS := range s.ants {
+	s.ants.Each(func(i int, antOS *AntOS) {
 		go func(antOS *AntOS) {
 			defer wg.Done()
 			// poc
@@ -95,17 +101,18 @@ func (s *Simulation) Update() error {
 			defer mu.Unlock()
 			s.rtree.Replace(oldMin, oldMax, antOS, newMin, newMax, antOS)
 		}(antOS)
-	}
-	for _, sugar := range s.sugar {
+	})
+
+	s.sugar.Each(func(i int, sugar *Sugar) {
 		wg.Add(1)
 		go func(sugar *Sugar) {
 			defer wg.Done()
 			sugar.Update()
 		}(sugar)
-	}
+	})
 	wg.Wait()
 
-	for _, antOS := range s.ants {
+	s.ants.Each(func(i int, antOS *AntOS) {
 		wg.Add(1)
 		go func(antOS *AntOS) {
 			defer wg.Done()
@@ -126,27 +133,27 @@ func (s *Simulation) Update() error {
 				s.rtree.Search(antOS.Collides())
 			}(antOS)
 		}
-	}
+	})
 	wg.Wait()
-	for _, mark := range s.marks {
+	s.marks.Each(func(_ int, mark *Marking) {
 		mark.Update()
-	}
+	})
 	s.FlushMarkingChanges()
 	return nil
 }
 
 func (s *Simulation) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{R: 0x80, G: 0xc0, B: 0xa0, A: 0xff})
-	// screen.Fill(color.RGBA{R: 0xff, G: 0xff, B: 0xff, A: 0xff})
-	for _, mark := range s.marks {
+
+	s.marks.Each(func(_ int, mark *Marking) {
 		mark.Draw(screen)
-	}
-	for _, ant := range s.ants {
-		ant.Draw(screen)
-	}
-	for _, sugar := range s.sugar {
+	})
+	s.ants.Each(func(i int, antOS *AntOS) {
+		antOS.Draw(screen)
+	})
+	s.sugar.Each(func(i int, sugar *Sugar) {
 		sugar.Draw(screen)
-	}
+	})
 	s.antHill.Draw(screen)
 	// s.apple.Draw(screen)
 	// x, y := ebiten.CursorPosition()
@@ -170,30 +177,30 @@ func (s *Simulation) AddNewAnt() {
 	newAnt := s.antConstructor(antOS)
 	antOS.Init(newAnt)
 
-	s.ants = append(s.ants, antOS)
+	s.ants.Append(antOS)
 	newMin, newMax := antOS.Bounds()
 	s.rtree.Insert(newMin, newMax, antOS)
 }
 
 func (s *Simulation) RemoveAnt(ant *AntOS) {
-	for i, a := range s.ants {
+	s.ants.Each(func(i int, a *AntOS) {
 		if a == ant {
-			s.ants = append(s.ants[:i], s.ants[i+1:]...)
+			s.ants.Remove(i)
 			vmin, vmax := ant.Bounds()
 			s.rtree.Delete(vmin, vmax, ant)
 			return
 		}
-	}
+	})
 }
 
 func (s *Simulation) RemoveSugar(sugar *Sugar) {
 	s.rtree.Delete(sugar.Bounds())
-	for i, _s := range s.sugar {
-		if _s == sugar {
-			s.sugar = append(s.sugar[:i], s.sugar[i+1:]...)
+	s.sugar.Each(func(i int, _sugar *Sugar) {
+		if _sugar == sugar {
+			s.sugar.Remove(i)
 			return
 		}
-	}
+	})
 }
 
 func (s *Simulation) AddMarkingAtPosition(position orb.Point, radius int, information int) {
@@ -209,7 +216,7 @@ func (s *Simulation) AddMarking(m *Marking) {
 
 func (s *Simulation) RemoveMarking(m *Marking) {
 	s.queueMutex.Lock()
-	s.removeMarkingQueue = append(s.removeMarkingQueue, m)
+	s.removeMarkingQueue[m] = struct{}{}
 	s.queueMutex.Unlock()
 }
 
@@ -218,20 +225,16 @@ func (s *Simulation) FlushMarkingChanges() {
 	defer s.queueMutex.Unlock()
 	for _, m := range s.addMarkingQueue {
 		s.rtree.Insert(m.Bounds())
-		s.marks = append(s.marks, m)
+		s.marks.Append(m)
 	}
 	s.addMarkingQueue = nil
 
-	for _, m := range s.removeMarkingQueue {
-		for i, mark := range s.marks {
-			if mark == m {
-				s.marks = append(s.marks[:i], s.marks[i+1:]...)
-				MarkCache.RemoveMark(m)
-				s.rtree.Delete(m.Bounds())
-				break
-			}
+	s.marks.Each(func(i int, mark *Marking) {
+		if _, ok := s.removeMarkingQueue[mark]; ok {
+			s.marks.Remove(i)
+			MarkCache.RemoveMark(mark)
+			s.rtree.Delete(mark.Bounds())
 		}
-		PutMarking(m)
-	}
-	s.removeMarkingQueue = nil
+	})
+	s.removeMarkingQueue = make(map[*Marking]struct{})
 }

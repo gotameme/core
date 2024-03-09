@@ -3,6 +3,7 @@ module github.com/gotameme/core
 go 1.22.0
 
 require (
+	github.com/emirpasic/gods/v2 v2.0.0-alpha
 	github.com/hajimehoshi/ebiten/v2 v2.6.6
 	github.com/paulmach/orb v0.11.1
 	github.com/tidwall/rtree v1.10.0
