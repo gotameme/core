@@ -23,15 +23,14 @@ package simulation
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/paulmach/orb"
 )
 
 type GameObject interface {
 	Update()
 	Draw(*ebiten.Image)
-	GetPosition() orb.Point
+	GetPosition() [2]float32
 }
 
 type Bounds interface {
-	ToBox() (min, max [2]float64)
+	ToBox() (min, max [2]float32)
 }

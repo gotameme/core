@@ -26,7 +26,6 @@ import (
 	"github.com/gotameme/core/internal/resources"
 	"github.com/gotameme/core/rand"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/paulmach/orb"
 )
 
 type AntHill struct {
@@ -35,11 +34,11 @@ type AntHill struct {
 	CurrentSugar int
 }
 
-func NewAntHill(screenWidth, screenHeight int, position orb.Point) *AntHill {
+func NewAntHill(screenWidth, screenHeight int, position [2]float32) *AntHill {
 	antHillAnimatedSprite := resources.NewAntHill(screenWidth, screenHeight)
 	antHillAnimatedSprite.Position = position
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(position[0]-float64(antHillAnimatedSprite.FrameWidth)/2, position[1]-float64(antHillAnimatedSprite.FrameHeight)/2)
+	op.GeoM.Translate(float64(position[0]-float32(antHillAnimatedSprite.FrameWidth)/2), float64(position[1]-float32(antHillAnimatedSprite.FrameHeight)/2))
 	// Anthill is currently a static image, so we can draw it once and forget about it
 	anthillImage := ebiten.NewImage(screenWidth, screenHeight)
 	anthillImage.DrawImage(antHillAnimatedSprite.Draw(), op)
@@ -50,8 +49,8 @@ func NewAntHill(screenWidth, screenHeight int, position orb.Point) *AntHill {
 }
 
 func NewRandomAntHill(screenWidth, screenHeight, border int) *AntHill {
-	var minValue = [2]float64{float64(border), float64(border)}
-	var maxValue = [2]float64{float64(screenWidth - border), float64(screenHeight - border)}
+	var minValue = [2]float32{float32(border), float32(border)}
+	var maxValue = [2]float32{float32(screenWidth - border), float32(screenHeight - border)}
 	return NewAntHill(screenWidth, screenHeight, rand.RandomPoint(minValue, maxValue))
 }
 
@@ -59,7 +58,7 @@ func (a *AntHill) Draw(screen *ebiten.Image) {
 	screen.DrawImage(a.img, nil)
 }
 
-func (a *AntHill) Bounds() ([2]float64, [2]float64, *AntHill) {
+func (a *AntHill) Bounds() ([2]float32, [2]float32, *AntHill) {
 	var aMin, aMax = a.AnimatedSprite.Bounds()
 	return aMin, aMax, a
 }

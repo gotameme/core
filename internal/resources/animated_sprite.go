@@ -24,7 +24,6 @@ package resources
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/paulmach/orb"
 	"image"
 )
 
@@ -36,14 +35,31 @@ type Animation struct {
 
 type AnimatedSprite struct {
 	Image                     *ebiten.Image
-	Position                  orb.Point
+	Position                  [2]float32
 	ScreenWidth, ScreenHeight int
 	FrameWidth, FrameHeight   int
+	centerX, centerY          float32
 	Animations                []Animation
 	CurrentAnimation          int
 	Count                     int
 	//
 	AnimationSpeed int
+}
+
+func newAnimatedSprite(image *ebiten.Image, screenWidth, screenHeight int, frameWidth, frameHeight int, animations []Animation, animationSpeed int) AnimatedSprite {
+	return AnimatedSprite{
+		Image:            image,
+		ScreenWidth:      screenWidth,
+		ScreenHeight:     screenHeight,
+		FrameWidth:       frameWidth,
+		FrameHeight:      frameHeight,
+		centerX:          float32(frameWidth) / 2,
+		centerY:          float32(frameHeight) / 2,
+		Animations:       animations,
+		CurrentAnimation: 0,
+		Count:            0,
+		AnimationSpeed:   animationSpeed,
+	}
 }
 
 // GetCenteredRotationOffset calculates the offsets necessary for centering the rotation point of the sprite.
@@ -54,7 +70,7 @@ type AnimatedSprite struct {
 // framework.
 func (a *AnimatedSprite) GetCenteredRotationOffset() (float64, float64) {
 	// Calculate and return the offsets for centered rotation based on frame dimensions
-	return -float64(a.FrameWidth) / 2, -float64(a.FrameHeight) / 2
+	return float64(-a.centerX), float64(-a.centerY)
 }
 
 func (a *AnimatedSprite) Update() {
@@ -72,14 +88,14 @@ func (a *AnimatedSprite) Draw() *ebiten.Image {
 	return a.Image.SubImage(image.Rect(sx, sy, sx+a.FrameWidth, sy+a.FrameHeight)).(*ebiten.Image)
 }
 
-func (a *AnimatedSprite) GetPosition() orb.Point {
+func (a *AnimatedSprite) GetPosition() [2]float32 {
 	return a.Position
 }
 
-func (a *AnimatedSprite) Bounds() (min, max [2]float64) {
-	min[0] = a.Position[0] - float64(a.FrameWidth/2)
-	min[1] = a.Position[1] - float64(a.FrameHeight/2)
-	max[0] = a.Position[0] + float64(a.FrameWidth/2)
-	max[1] = a.Position[1] + float64(a.FrameHeight/2)
+func (a *AnimatedSprite) Bounds() (min, max [2]float32) {
+	min[0] = float32(a.Position[0]) - a.centerX
+	min[1] = float32(a.Position[1]) - a.centerY
+	max[0] = float32(a.Position[0]) + a.centerX
+	max[1] = float32(a.Position[1]) + a.centerY
 	return
 }

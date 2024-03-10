@@ -24,7 +24,6 @@ package simulation
 import (
 	"github.com/gotameme/core/internal/helper"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/paulmach/orb"
 	"image/color"
 )
 
@@ -32,17 +31,17 @@ type Marking struct {
 	simulation  *Simulation
 	img         *ebiten.Image
 	op          *ebiten.DrawImageOptions
-	Position    orb.Point
+	Position    [2]float32
 	Radius      int
 	Information int
 	Lifespan    int
 }
 
-func (m *Marking) GetPosition() orb.Point {
+func (m *Marking) GetPosition() [2]float32 {
 	return m.Position
 }
 
-func NewMarking(simulation *Simulation, position orb.Point, radius int, information int) *Marking {
+func NewMarking(simulation *Simulation, position [2]float32, radius int, information int) *Marking {
 	// return &Marking{
 	// 	simulation:  simulation,
 	// 	Position:    position,
@@ -63,7 +62,7 @@ func (m *Marking) Draw(screen *ebiten.Image) {
 	if m.img == nil {
 		circle := helper.NewCircle(m.Radius, color.RGBA{R: 128, G: 128, B: 0, A: 255})
 		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(m.Position[0]-float64(m.Radius), m.Position[1]-float64(m.Radius))
+		op.GeoM.Translate(float64(m.Position[0]-float32(m.Radius)), float64(m.Position[1]-float32(m.Radius)))
 		m.img = circle
 		m.op = op
 	}
@@ -77,9 +76,9 @@ func (m *Marking) Update() {
 	}
 }
 
-func (m *Marking) Bounds() ([2]float64, [2]float64, *Marking) {
-	vmin := [2]float64{m.Position[0] - float64(m.Radius), m.Position[1] - float64(m.Radius)}
-	vmax := [2]float64{m.Position[0] + float64(m.Radius), m.Position[1] + float64(m.Radius)}
+func (m *Marking) Bounds() ([2]float32, [2]float32, *Marking) {
+	vmin := [2]float32{m.Position[0] - float32(m.Radius), m.Position[1] - float32(m.Radius)}
+	vmax := [2]float32{m.Position[0] + float32(m.Radius), m.Position[1] + float32(m.Radius)}
 	return vmin, vmax, m
 }
 

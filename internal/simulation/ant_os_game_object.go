@@ -57,7 +57,7 @@ func (a *AntOS) Draw(screen *ebiten.Image) {
 	// }
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(a.AnimatedSprite.GetCenteredRotationOffset())
-	op.GeoM.Rotate(a.CurrentDirection * gmath.DegToRad)
-	op.GeoM.Translate(a.Position[0], a.Position[1])
+	op.GeoM.Rotate(float64(a.CurrentDirection * gmath.DegToRad))
+	op.GeoM.Translate(float64(a.Position[0]), float64(a.Position[1]))
 	screen.DrawImage(img, op)
 }

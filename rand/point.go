@@ -22,8 +22,6 @@
 
 package rand
 
-import "github.com/paulmach/orb"
-
-func RandomPoint(min, max [2]float64) orb.Point {
-	return orb.Point{Float64MinMax(min[0], max[0]), Float64MinMax(min[1], max[1])}
+func RandomPoint(min, max [2]float32) [2]float32 {
+	return [2]float32{Float32MinMax(min[0], max[0]), Float32MinMax(min[1], max[1])}
 }

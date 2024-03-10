@@ -21,8 +21,8 @@ THE SOFTWARE.
 */
 package simulation
 
-type SearchIter func(min, max [2]float64, data GameObject) bool
+type SearchIter func(min, max [2]float32, data GameObject) bool
 
 type Box interface {
-	ToBox() (min, max [2]float64)
+	ToBox() (min, max [2]float32)
 }

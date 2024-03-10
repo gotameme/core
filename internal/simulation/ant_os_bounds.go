@@ -22,29 +22,29 @@ THE SOFTWARE.
 package simulation
 
 import (
+	"github.com/chewxy/math32"
 	"github.com/gotameme/core/ant"
 	gmath "github.com/gotameme/core/internal/math"
-	"math"
 	"reflect"
 )
 
-func (a *AntOS) sightBox() ([2]float64, [2]float64) {
-	return gmath.NewCircle(a.Position[0], a.Position[1], float64(a.Vision)).ToBox()
+func (a *AntOS) sightBox() ([2]float32, [2]float32) {
+	return gmath.NewCircle(a.Position[0], a.Position[1], float32(a.Vision)).ToBox()
 }
 
-func (a *AntOS) bounds() ([2]float64, [2]float64) {
-	return gmath.NewRect(a.Position[0], a.Position[1], float64(a.FrameWidth), float64(a.FrameHeight)).ToBox()
+func (a *AntOS) bounds() ([2]float32, [2]float32) {
+	return gmath.NewRect(a.Position[0], a.Position[1], float32(a.FrameWidth), float32(a.FrameHeight)).ToBox()
 }
 
-func distance(a, b [2]float64) float64 {
+func distance(a, b [2]float32) float32 {
 	dx := a[0] - b[0]
 	dy := a[1] - b[1]
-	return math.Sqrt(dx*dx + dy*dy)
+	return math32.Sqrt(dx*dx + dy*dy)
 }
 
-func (a *AntOS) See() ([2]float64, [2]float64, SearchIter) {
+func (a *AntOS) See() ([2]float32, [2]float32, SearchIter) {
 	start, end := a.sightBox()
-	return start, end, func(min, max [2]float64, data GameObject) bool {
+	return start, end, func(min, max [2]float32, data GameObject) bool {
 		if data == a {
 			return true
 		}
@@ -66,7 +66,7 @@ func (a *AntOS) See() ([2]float64, [2]float64, SearchIter) {
 				if sugar.CurrentSugar <= 0 {
 					return true
 				}
-				if distance(a.Position, sugar.Position) <= float64(a.Vision) && a.Target != sugar {
+				if distance(a.Position, sugar.Position) <= float32(a.Vision) && a.Target != sugar {
 					sugarAnt.SeeSugar(sugar)
 				}
 			}
@@ -86,9 +86,9 @@ func (a *AntOS) See() ([2]float64, [2]float64, SearchIter) {
 	}
 }
 
-func (a *AntOS) Smell() ([2]float64, [2]float64, SearchIter) {
+func (a *AntOS) Smell() ([2]float32, [2]float32, SearchIter) {
 	start, end := a.bounds()
-	return start, end, func(min, max [2]float64, data GameObject) bool {
+	return start, end, func(min, max [2]float32, data GameObject) bool {
 		if data == a {
 			return true
 		}
@@ -116,9 +116,9 @@ func (a *AntOS) Smell() ([2]float64, [2]float64, SearchIter) {
 	}
 }
 
-func (a *AntOS) Collides() ([2]float64, [2]float64, SearchIter) {
+func (a *AntOS) Collides() ([2]float32, [2]float32, SearchIter) {
 	start, end := a.bounds()
-	return start, end, func(min, max [2]float64, data GameObject) bool {
+	return start, end, func(min, max [2]float32, data GameObject) bool {
 		if data == a {
 			return true
 		}

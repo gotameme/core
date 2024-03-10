@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 package simulation
 
-func (s *Sugar) Bounds() ([2]float64, [2]float64, *Sugar) {
+func (s *Sugar) Bounds() ([2]float32, [2]float32, *Sugar) {
 	start, end := s.ToBox()
 	return start, end, s
 }

@@ -30,13 +30,12 @@ import (
 	dll "github.com/emirpasic/gods/v2/lists/doublylinkedlist"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/paulmach/orb"
 	"github.com/tidwall/rtree"
 )
 
 type Simulation struct {
 	screenWidth, screenHeight int
-	rtree                     *rtree.RTreeG[GameObject]
+	rtree                     *rtree.RTreeGN[float32, GameObject]
 	addMarkingQueue           []*Marking
 	removeMarkingQueue        map[*Marking]struct{}
 	queueMutex                sync.Mutex
@@ -52,7 +51,7 @@ type Simulation struct {
 }
 
 func NewSimulation(screenWidth, screenHeight int, cnf SimulationConfig) *Simulation {
-	var rTree = rtree.RTreeG[GameObject]{}
+	var rTree = rtree.RTreeGN[float32, GameObject]{}
 	var antHill = NewRandomAntHill(screenWidth, screenHeight, 30)
 	var apple = NewRandomApple(screenWidth, screenHeight, 30)
 	rTree.Insert(antHill.Bounds())
@@ -203,7 +202,7 @@ func (s *Simulation) RemoveSugar(sugar *Sugar) {
 	})
 }
 
-func (s *Simulation) AddMarkingAtPosition(position orb.Point, radius int, information int) {
+func (s *Simulation) AddMarkingAtPosition(position [2]float32, radius int, information int) {
 	marking := NewMarking(s, position, radius, information)
 	s.AddMarking(marking)
 }

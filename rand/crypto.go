@@ -46,7 +46,14 @@ func Float64() float64 {
 	}
 	return float64(b.Int64()) / (1 << 63)
 }
+func Float32() float32 {
+	return float32(Float64())
+}
 
 func Float64MinMax(min, max float64) float64 {
 	return Float64()*(max-min) + min
+}
+
+func Float32MinMax(min, max float32) float32 {
+	return Float32()*(max-min) + min
 }

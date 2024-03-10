@@ -23,6 +23,7 @@
 package math
 
 import (
+	"github.com/chewxy/math32"
 	"github.com/paulmach/orb"
 	"math"
 )
@@ -32,34 +33,31 @@ const (
 	RadToDeg = 180 / math.Pi
 )
 
-type Rect [2]orb.Point
+type Rect [2][2]float32
 
-func NewRect(x, y, w, h float64) Rect {
-	return Rect{orb.Point{x - w/2, y - h/2}, orb.Point{x + w/2, y + h/2}}
+func NewRect(x, y, w, h float32) Rect {
+	return Rect{[2]float32{x - w/2, y - h/2}, [2]float32{x + w/2, y + h/2}}
 }
 
-func (r Rect) ToBox() (min, max [2]float64) {
-	return [2]float64{r[0][0], r[0][1]}, [2]float64{r[1][0], r[1][1]}
+func (r Rect) ToBox() (min, max [2]float32) {
+	return [2]float32{r[0][0], r[0][1]}, [2]float32{r[1][0], r[1][1]}
 }
 
 func (r Rect) Size() (w, h float32) {
-	return float32(r[1][0] - r[0][0]), float32(r[1][1] - r[0][1])
+	return r[1][0] - r[0][0], r[1][1] - r[0][1]
 }
 
 type Circle struct {
-	orb.Point
-	Radius float64
+	Position [2]float32
+	Radius   float32
 	Rect
 }
 
-func NewCircle(x, y, r float64) Circle {
+func NewCircle(x, y, r float32) Circle {
 	return Circle{
-		orb.Point{x, y},
+		[2]float32{x, y},
 		r,
-		Rect{
-			orb.Point{x - r, y - r},
-			orb.Point{x + r, y + r},
-		},
+		NewRect(x, y, r*2, r*2),
 	}
 }
 
@@ -67,10 +65,10 @@ func CalcCenterOfGravity(min orb.Point, max orb.Point) orb.Point {
 	return orb.Point{(min[0] + max[0]) / 2, (min[1] + max[1]) / 2}
 }
 
-func CalculateDirection(p1, p2 orb.Point) int {
+func CalculateDirection(p1, p2 [2]float32) int {
 	// Berechne den Winkel in Radiant
-	angle := math.Atan2(p2.Y()-p1.Y(), p2.X()-p1.X())
-	return int(math.Round(angle * RadToDeg))
+	angle := math32.Atan2(p2[1]-p1[1], p2[0]-p1[0])
+	return int(math32.Round(angle * RadToDeg))
 }
 
 // TouchesOrIntersects prüft, ob sich zwei Boxen berühren oder überschneiden.

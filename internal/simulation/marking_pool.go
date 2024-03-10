@@ -22,7 +22,6 @@ THE SOFTWARE.
 package simulation
 
 import (
-	"github.com/paulmach/orb"
 	"sync"
 )
 
@@ -30,7 +29,7 @@ var markingPool = sync.Pool{
 	New: func() interface{} {
 		return &Marking{
 			simulation:  nil,
-			Position:    orb.Point{},
+			Position:    [2]float32{0, 0},
 			Radius:      0,
 			Information: 0,
 			Lifespan:    150,

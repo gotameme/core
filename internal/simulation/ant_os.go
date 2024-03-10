@@ -26,7 +26,6 @@ import (
 	"github.com/gotameme/core/internal/helper"
 	"github.com/gotameme/core/internal/resources"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/paulmach/orb"
 	"image/color"
 )
 
@@ -36,9 +35,9 @@ type AntOptions func(*AntOS)
 
 type AntOSConstructor func(AntOptions) *AntOS
 
-func WithPosition(x, y float64) AntOptions {
+func WithPosition(x, y float32) AntOptions {
 	return func(a *AntOS) {
-		a.Position = orb.Point{x, y}
+		a.Position = [2]float32{x, y}
 	}
 }
 
@@ -68,7 +67,7 @@ type AntOS struct {
 
 	visionImage *ebiten.Image
 
-	CurrentDirection float64 // in degrees
+	CurrentDirection float32 // in degrees
 	State            AntOSState
 	CurrentSugarLoad int
 

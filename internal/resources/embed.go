@@ -134,17 +134,3 @@ func DecodeEbitenImage(data []byte) *ebiten.Image {
 	}
 	return ebiten.NewImageFromImage(img)
 }
-
-func newAnimatedSprite(image *ebiten.Image, screenWidth, screenHeight int, frameWidth, frameHeight int, animations []Animation, animationSpeed int) AnimatedSprite {
-	return AnimatedSprite{
-		Image:            image,
-		ScreenWidth:      screenWidth,
-		ScreenHeight:     screenHeight,
-		FrameWidth:       frameWidth,
-		FrameHeight:      frameHeight,
-		Animations:       animations,
-		CurrentAnimation: 0,
-		Count:            0,
-		AnimationSpeed:   animationSpeed,
-	}
-}

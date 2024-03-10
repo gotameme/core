@@ -25,7 +25,6 @@ import (
 	"github.com/gotameme/core/internal/resources"
 	"github.com/gotameme/core/rand"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/paulmach/orb"
 	"log"
 
 	gmath "github.com/gotameme/core/internal/math"
@@ -38,10 +37,10 @@ type Sugar struct {
 	CurrentSugar int
 }
 
-func NewSugar(simulation *Simulation, position orb.Point) *Sugar {
+func NewSugar(simulation *Simulation, position [2]float32) *Sugar {
 	sugar := resources.NewSugar(simulation.screenWidth, simulation.screenHeight)
 	sugar.Position = position
-	rect := gmath.NewRect(position[0], position[1], float64(sugar.FrameWidth), float64(sugar.FrameHeight))
+	rect := gmath.NewRect(position[0], position[1], float32(sugar.FrameWidth), float32(sugar.FrameHeight))
 	log.Println(position[0], position[1], float64(sugar.FrameWidth), float64(sugar.FrameHeight), rect)
 	return &Sugar{
 		simulation:     simulation,
@@ -52,8 +51,8 @@ func NewSugar(simulation *Simulation, position orb.Point) *Sugar {
 }
 
 func NewRandomSugar(simulation *Simulation, border int) *Sugar {
-	var minValue = [2]float64{float64(border), float64(border)}
-	var maxValue = [2]float64{float64(simulation.screenWidth - border), float64(simulation.screenHeight - border)}
+	var minValue = [2]float32{float32(border), float32(border)}
+	var maxValue = [2]float32{float32(simulation.screenWidth - border), float32(simulation.screenHeight - border)}
 	return NewSugar(simulation, rand.RandomPoint(minValue, maxValue))
 }
 
@@ -83,7 +82,7 @@ func (s *Sugar) Draw(screen *ebiten.Image) {
 	// draw ant at position 100, 100
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(s.GetCenteredRotationOffset())
-	op.GeoM.Translate(s.Position[0], s.Position[1])
+	op.GeoM.Translate(float64(s.Position[0]), float64(s.Position[1]))
 	screen.DrawImage(img, op)
 }
 

@@ -22,9 +22,8 @@ THE SOFTWARE.
 package simulation
 
 import (
+	"github.com/chewxy/math32"
 	gmath "github.com/gotameme/core/internal/math"
-	"github.com/paulmach/orb"
-	"math"
 )
 
 type AntOSState interface {
@@ -32,7 +31,7 @@ type AntOSState interface {
 }
 
 type AntOSMoving struct {
-	TargetDirection *float64 // The direction the Ant should move to in degrees
+	TargetDirection *float32 // The direction the Ant should move to in degrees
 	Steps           *int     // The number of steps the Ant should take
 }
 
@@ -67,8 +66,8 @@ func (a *AntOSMoving) rotate(os *AntOS) {
 		directionDifference -= 360
 	}
 
-	rotationSpeed := float64(os.Rotation)
-	if math.Abs(directionDifference) < rotationSpeed {
+	rotationSpeed := float32(os.Rotation)
+	if math32.Abs(directionDifference) < rotationSpeed {
 		os.CurrentDirection = *a.TargetDirection
 		a.TargetDirection = nil // Stop rotating
 	} else {
@@ -93,22 +92,22 @@ func (a *AntOSMoving) move(os *AntOS) {
 		return
 	}
 
-	speed := float64(os.Speed)
+	speed := float32(os.Speed)
 	if os.CurrentSugarLoad > 0 {
 		// Ant is carrying sugar, reduce speed
 		speed /= 2.0
 	}
 	// calculate the new position
 	*a.Steps -= int(speed)
-	x := os.Position.X() + speed*math.Cos(os.CurrentDirection*gmath.DegToRad)
-	y := os.Position.Y() + speed*math.Sin(os.CurrentDirection*gmath.DegToRad)
-	os.Position = orb.Point{x, y}
+	x := os.Position[0] + speed*math32.Cos(os.CurrentDirection*gmath.DegToRad)
+	y := os.Position[1] + speed*math32.Sin(os.CurrentDirection*gmath.DegToRad)
+	os.Position = [2]float32{x, y}
 	if x < 0 {
 		// bounce left edge of screen reached
 		os.Position[0] = -x
 		os.CurrentDirection = 180 - os.CurrentDirection
 		// log.Printf("bounce left edge of screen reached: %f, %v", s.angle, s.v)
-	} else if mx := float64(os.ScreenWidth) - float64(os.FrameWidth)/2; mx <= x {
+	} else if mx := float32(os.ScreenWidth) - float32(os.FrameWidth)/2; mx <= x {
 		// bounce right edge of screen reached
 		os.Position[0] = 2*mx - x
 		os.CurrentDirection = 180 - os.CurrentDirection
@@ -118,7 +117,7 @@ func (a *AntOSMoving) move(os *AntOS) {
 		os.Position[1] = -y
 		os.CurrentDirection = -os.CurrentDirection
 		// log.Printf("bounce top edge of screen reached: %f, %v", s.angle, s.v)
-	} else if my := float64(os.ScreenHeight - os.FrameHeight/2); my <= y {
+	} else if my := float32(os.ScreenHeight - os.FrameHeight/2); my <= y {
 		// bounce bottom edge of screen reached
 		os.Position[1] = 2*my - y
 		os.CurrentDirection = -os.CurrentDirection

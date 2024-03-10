@@ -56,7 +56,7 @@ func (a *AntOS) GoForward(steps int) {
 }
 
 func (a *AntOS) Turn(direction int) {
-	fDirection := float64(direction)
+	fDirection := float32(direction)
 	if _, ok := a.State.(*AntOSMoving); !ok {
 		a.State = &AntOSMoving{
 			TargetDirection: &fDirection,
