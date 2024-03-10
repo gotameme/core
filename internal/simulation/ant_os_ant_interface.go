@@ -102,6 +102,6 @@ func (a *AntOS) GotToAntHill() {
 func (a *AntOS) SetMark(radius, information int) {
 	if a.Range >= a.SetMarkResetTime {
 		a.SetMarkResetTime = a.Range + a.SetMarkThreshold
-		a.simulation.AddMarkingAtPosition(a.GetPosition(), radius, information)
+		a.AddMarkingAtCurrentPosition(radius, information)
 	}
 }

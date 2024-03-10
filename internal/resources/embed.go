@@ -50,11 +50,9 @@ var (
 	GreenApple_png []byte
 )
 
-func NewAnimatedAnt(screenWidth, screenHeight int) AnimatedSprite {
+func NewAnimatedAnt() AnimatedSprite {
 	return newAnimatedSprite(
 		DecodeEbitenImage(AntSimpleSprites_png),
-		screenWidth,
-		screenHeight,
 		8,
 		4,
 		[]Animation{
@@ -65,16 +63,14 @@ func NewAnimatedAnt(screenWidth, screenHeight int) AnimatedSprite {
 	)
 }
 
-func NewAntHill(screenWidth, screenHeight int) AnimatedSprite {
+func NewAntHill() AnimatedSprite {
 	img, _, err := image.Decode(bytes.NewReader(AntHill_png))
 	if err != nil {
 		panic(err)
 	}
-	w, h := 32, 32
+	w, h := 24, 14
 	return newAnimatedSprite(
 		ebiten.NewImageFromImage(img),
-		screenWidth,
-		screenHeight,
 		w,
 		h,
 		[]Animation{
@@ -84,7 +80,7 @@ func NewAntHill(screenWidth, screenHeight int) AnimatedSprite {
 	)
 }
 
-func NewGreenApple(screenWidth, screenHeight int) AnimatedSprite {
+func NewGreenApple() AnimatedSprite {
 	img, _, err := image.Decode(bytes.NewReader(GreenApple_png))
 	if err != nil {
 		panic(err)
@@ -92,8 +88,6 @@ func NewGreenApple(screenWidth, screenHeight int) AnimatedSprite {
 	w, h := 19, 24
 	return newAnimatedSprite(
 		ebiten.NewImageFromImage(img),
-		screenWidth,
-		screenHeight,
 		w,
 		h,
 		[]Animation{
@@ -103,11 +97,9 @@ func NewGreenApple(screenWidth, screenHeight int) AnimatedSprite {
 	)
 }
 
-func NewSugar(screenWidth, screenHeight int) AnimatedSprite {
+func NewSugar() AnimatedSprite {
 	return newAnimatedSprite(
 		DecodeEbitenImage(Sugar2_png),
-		screenWidth,
-		screenHeight,
 		32,
 		24,
 		[]Animation{

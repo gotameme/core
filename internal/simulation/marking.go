@@ -27,8 +27,15 @@ import (
 	"image/color"
 )
 
+var autoMarkingID int
+
+func generateMarkingID() int {
+	autoMarkingID++
+	return autoMarkingID
+}
+
 type Marking struct {
-	simulation  *Simulation
+	id          int
 	img         *ebiten.Image
 	op          *ebiten.DrawImageOptions
 	Position    [2]float32
@@ -41,16 +48,8 @@ func (m *Marking) GetPosition() [2]float32 {
 	return m.Position
 }
 
-func NewMarking(simulation *Simulation, position [2]float32, radius int, information int) *Marking {
-	// return &Marking{
-	// 	simulation:  simulation,
-	// 	Position:    position,
-	// 	Radius:      radius,
-	// 	Information: information,
-	// 	Range:    150, // ticks
-	// }
+func NewMarking(position [2]float32, radius int, information int) *Marking {
 	m := GetMarking()
-	m.simulation = simulation
 	m.Position = position
 	m.Radius = radius
 	m.Information = information
@@ -69,14 +68,14 @@ func (m *Marking) Draw(screen *ebiten.Image) {
 	screen.DrawImage(m.img, m.op)
 }
 
-func (m *Marking) Update() {
+func (m *Marking) Update(simulation *Simulation) {
 	m.Lifespan--
 	if m.Lifespan <= 0 {
-		m.simulation.RemoveMarking(m)
+		simulation.RemoveMarking(m)
 	}
 }
 
-func (m *Marking) Bounds() ([2]float32, [2]float32, *Marking) {
+func (m *Marking) Bounds() ([2]float32, [2]float32, GameObject) {
 	vmin := [2]float32{m.Position[0] - float32(m.Radius), m.Position[1] - float32(m.Radius)}
 	vmax := [2]float32{m.Position[0] + float32(m.Radius), m.Position[1] + float32(m.Radius)}
 	return vmin, vmax, m

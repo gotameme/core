@@ -57,8 +57,8 @@ func WithRole(role string, properties Properties) AntOptions {
 
 type AntOS struct {
 	id         int
-	role       string
 	simulation *Simulation
+	role       string
 	resources.AnimatedSprite
 	ant interface{}
 
@@ -77,13 +77,13 @@ type AntOS struct {
 	SetMarkResetTime int
 }
 
-func NewAntOS(simulation *Simulation, options ...AntOptions) *AntOS {
+func NewAntOS(sim *Simulation, options ...AntOptions) *AntOS {
 	autoAntID++
 	antOS := &AntOS{
 		id:               autoAntID,
-		simulation:       simulation,
-		AnimatedSprite:   resources.NewAnimatedAnt(simulation.screenWidth, simulation.screenHeight),
-		Properties:       simulation.defaultRoleProperties,
+		simulation:       sim,
+		AnimatedSprite:   resources.NewAnimatedAnt(),
+		Properties:       sim.defaultRoleProperties,
 		SetMarkThreshold: 10, // in ticks
 	}
 
@@ -102,4 +102,8 @@ func (a *AntOS) Init(ant interface{}) {
 
 func (a *AntOS) IsInitialized() bool {
 	return a.ant != nil
+}
+
+func (a *AntOS) AddMarkingAtCurrentPosition(radius, information int) {
+	a.simulation.AddMarkingAtPosition(a.Position, radius, information)
 }

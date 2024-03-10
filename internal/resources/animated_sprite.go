@@ -34,23 +34,20 @@ type Animation struct {
 }
 
 type AnimatedSprite struct {
-	Image                     *ebiten.Image
-	Position                  [2]float32
-	ScreenWidth, ScreenHeight int
-	FrameWidth, FrameHeight   int
-	centerX, centerY          float32
-	Animations                []Animation
-	CurrentAnimation          int
-	Count                     int
+	Image                   *ebiten.Image
+	Position                [2]float32
+	FrameWidth, FrameHeight int
+	centerX, centerY        float32
+	Animations              []Animation
+	CurrentAnimation        int
+	Count                   int
 	//
 	AnimationSpeed int
 }
 
-func newAnimatedSprite(image *ebiten.Image, screenWidth, screenHeight int, frameWidth, frameHeight int, animations []Animation, animationSpeed int) AnimatedSprite {
+func newAnimatedSprite(image *ebiten.Image, frameWidth, frameHeight int, animations []Animation, animationSpeed int) AnimatedSprite {
 	return AnimatedSprite{
 		Image:            image,
-		ScreenWidth:      screenWidth,
-		ScreenHeight:     screenHeight,
 		FrameWidth:       frameWidth,
 		FrameHeight:      frameHeight,
 		centerX:          float32(frameWidth) / 2,
@@ -93,9 +90,9 @@ func (a *AnimatedSprite) GetPosition() [2]float32 {
 }
 
 func (a *AnimatedSprite) Bounds() (min, max [2]float32) {
-	min[0] = float32(a.Position[0]) - a.centerX
-	min[1] = float32(a.Position[1]) - a.centerY
-	max[0] = float32(a.Position[0]) + a.centerX
-	max[1] = float32(a.Position[1]) + a.centerY
+	min[0] = a.Position[0] - a.centerX
+	min[1] = a.Position[1] - a.centerY
+	max[0] = a.Position[0] + a.centerX
+	max[1] = a.Position[1] + a.centerY
 	return
 }

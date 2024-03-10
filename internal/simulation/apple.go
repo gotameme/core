@@ -34,7 +34,7 @@ type Apple struct {
 }
 
 func NewApple(screenWidth, screenHeight int, position [2]float32) *Apple {
-	antHillAnimatedSprite := resources.NewGreenApple(screenWidth, screenHeight)
+	antHillAnimatedSprite := resources.NewGreenApple()
 	antHillAnimatedSprite.Position = position
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(position[0]-float32(antHillAnimatedSprite.FrameWidth)/2), float64(position[1]-float32(antHillAnimatedSprite.FrameHeight)/2))
@@ -62,6 +62,6 @@ func (a *Apple) Bounds() ([2]float32, [2]float32, *Apple) {
 	return aMin, aMax, a
 }
 
-func (a *Apple) Update() {
+func (a *Apple) Update(*Simulation) {
 	// Overwrite the Update method to do nothing
 }

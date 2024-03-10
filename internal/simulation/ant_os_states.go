@@ -27,7 +27,7 @@ import (
 )
 
 type AntOSState interface {
-	Update(os *AntOS)
+	Update(*Simulation, *AntOS)
 }
 
 type AntOSMoving struct {
@@ -35,7 +35,7 @@ type AntOSMoving struct {
 	Steps           *int     // The number of steps the Ant should take
 }
 
-func (a *AntOSMoving) Update(os *AntOS) {
+func (a *AntOSMoving) Update(sim *Simulation, os *AntOS) {
 	if a.TargetDirection != nil {
 		// Check if the Ant is already facing the target direction
 		if os.CurrentDirection != *a.TargetDirection {
@@ -45,7 +45,7 @@ func (a *AntOSMoving) Update(os *AntOS) {
 		a.TargetDirection = nil // Stop rotating
 	}
 	if a.Steps != nil {
-		a.move(os)
+		a.move(sim, os)
 		return
 	}
 
@@ -86,7 +86,7 @@ func (a *AntOSMoving) rotate(os *AntOS) {
 	}
 }
 
-func (a *AntOSMoving) move(os *AntOS) {
+func (a *AntOSMoving) move(sim *Simulation, os *AntOS) {
 	if a.Steps == nil || *a.Steps <= 0 {
 		a.Steps = nil // Stop moving
 		return
@@ -107,7 +107,7 @@ func (a *AntOSMoving) move(os *AntOS) {
 		os.Position[0] = -x
 		os.CurrentDirection = 180 - os.CurrentDirection
 		// log.Printf("bounce left edge of screen reached: %f, %v", s.angle, s.v)
-	} else if mx := float32(os.ScreenWidth) - float32(os.FrameWidth)/2; mx <= x {
+	} else if mx := float32(sim.screenWidth) - float32(os.FrameWidth)/2; mx <= x {
 		// bounce right edge of screen reached
 		os.Position[0] = 2*mx - x
 		os.CurrentDirection = 180 - os.CurrentDirection
@@ -117,7 +117,7 @@ func (a *AntOSMoving) move(os *AntOS) {
 		os.Position[1] = -y
 		os.CurrentDirection = -os.CurrentDirection
 		// log.Printf("bounce top edge of screen reached: %f, %v", s.angle, s.v)
-	} else if my := float32(os.ScreenHeight - os.FrameHeight/2); my <= y {
+	} else if my := float32(sim.screenHeight - os.FrameHeight/2); my <= y {
 		// bounce bottom edge of screen reached
 		os.Position[1] = 2*my - y
 		os.CurrentDirection = -os.CurrentDirection

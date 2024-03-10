@@ -35,7 +35,7 @@ type AntHill struct {
 }
 
 func NewAntHill(screenWidth, screenHeight int, position [2]float32) *AntHill {
-	antHillAnimatedSprite := resources.NewAntHill(screenWidth, screenHeight)
+	antHillAnimatedSprite := resources.NewAntHill()
 	antHillAnimatedSprite.Position = position
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(position[0]-float32(antHillAnimatedSprite.FrameWidth)/2), float64(position[1]-float32(antHillAnimatedSprite.FrameHeight)/2))
@@ -63,6 +63,6 @@ func (a *AntHill) Bounds() ([2]float32, [2]float32, *AntHill) {
 	return aMin, aMax, a
 }
 
-func (a *AntHill) Update() {
+func (a *AntHill) Update(*Simulation) {
 	// Overwrite the Update method to do nothing
 }

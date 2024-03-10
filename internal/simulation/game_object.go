@@ -26,7 +26,7 @@ import (
 )
 
 type GameObject interface {
-	Update()
+	Update(*Simulation)
 	Draw(*ebiten.Image)
 	GetPosition() [2]float32
 }

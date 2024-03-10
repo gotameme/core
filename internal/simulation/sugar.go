@@ -22,28 +22,23 @@ THE SOFTWARE.
 package simulation
 
 import (
+	gmath "github.com/gotameme/core/internal/math"
 	"github.com/gotameme/core/internal/resources"
 	"github.com/gotameme/core/rand"
 	"github.com/hajimehoshi/ebiten/v2"
-	"log"
-
-	gmath "github.com/gotameme/core/internal/math"
 )
 
 type Sugar struct {
-	simulation *Simulation
 	resources.AnimatedSprite
 	gmath.Rect
 	CurrentSugar int
 }
 
-func NewSugar(simulation *Simulation, position [2]float32) *Sugar {
-	sugar := resources.NewSugar(simulation.screenWidth, simulation.screenHeight)
+func NewSugar(position [2]float32) *Sugar {
+	sugar := resources.NewSugar()
 	sugar.Position = position
 	rect := gmath.NewRect(position[0], position[1], float32(sugar.FrameWidth), float32(sugar.FrameHeight))
-	log.Println(position[0], position[1], float64(sugar.FrameWidth), float64(sugar.FrameHeight), rect)
 	return &Sugar{
-		simulation:     simulation,
 		AnimatedSprite: sugar,
 		Rect:           rect,
 		CurrentSugar:   1000,
@@ -53,12 +48,12 @@ func NewSugar(simulation *Simulation, position [2]float32) *Sugar {
 func NewRandomSugar(simulation *Simulation, border int) *Sugar {
 	var minValue = [2]float32{float32(border), float32(border)}
 	var maxValue = [2]float32{float32(simulation.screenWidth - border), float32(simulation.screenHeight - border)}
-	return NewSugar(simulation, rand.RandomPoint(minValue, maxValue))
+	return NewSugar(rand.RandomPoint(minValue, maxValue))
 }
 
-func (s *Sugar) Update() {
+func (s *Sugar) Update(simulation *Simulation) {
 	if s.CurrentSugar <= 0 {
-		s.simulation.RemoveSugar(s)
+		simulation.RemoveSugar(s)
 	}
 }
 

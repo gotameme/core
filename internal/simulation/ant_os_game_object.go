@@ -19,6 +19,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+
 package simulation
 
 import (
@@ -26,10 +27,10 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-func (a *AntOS) Update() {
+func (a *AntOS) Update(sim *Simulation) {
 	a.Range++
 	if a.State != nil {
-		a.State.Update(a)
+		a.State.Update(sim, a)
 	} else {
 		if waitAnt, ok := a.ant.(interface{ Waits() }); ok {
 			waitAnt.Waits()

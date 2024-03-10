@@ -28,7 +28,6 @@ import (
 var markingPool = sync.Pool{
 	New: func() interface{} {
 		return &Marking{
-			simulation:  nil,
 			Position:    [2]float32{0, 0},
 			Radius:      0,
 			Information: 0,
@@ -38,7 +37,9 @@ var markingPool = sync.Pool{
 }
 
 func GetMarking() *Marking {
-	return markingPool.Get().(*Marking)
+	m := markingPool.Get().(*Marking)
+	m.id = generateMarkingID()
+	return m
 }
 
 func PutMarking(m *Marking) {
