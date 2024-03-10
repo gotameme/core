@@ -24,7 +24,6 @@ package math
 
 import (
 	"github.com/chewxy/math32"
-	"github.com/paulmach/orb"
 	"math"
 )
 
@@ -61,8 +60,8 @@ func NewCircle(x, y, r float32) Circle {
 	}
 }
 
-func CalcCenterOfGravity(min orb.Point, max orb.Point) orb.Point {
-	return orb.Point{(min[0] + max[0]) / 2, (min[1] + max[1]) / 2}
+func CalcCenterOfGravity(min, max [2]float32) [2]float32 {
+	return [2]float32{(min[0] + max[0]) / 2, (min[1] + max[1]) / 2}
 }
 
 func CalculateDirection(p1, p2 [2]float32) int {

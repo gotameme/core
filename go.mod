@@ -6,7 +6,6 @@ require (
 	github.com/chewxy/math32 v1.10.1
 	github.com/emirpasic/gods/v2 v2.0.0-alpha
 	github.com/hajimehoshi/ebiten/v2 v2.6.6
-	github.com/paulmach/orb v0.11.1
 	github.com/tidwall/rtree v1.10.0
 )
 

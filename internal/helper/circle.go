@@ -25,7 +25,6 @@ package helper
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
-	"github.com/paulmach/orb"
 	"image/color"
 )
 
@@ -54,8 +53,8 @@ func NewCircle(r int, clr color.RGBA) *ebiten.Image {
 }
 
 // DrawRect returns a new rectangle image with the given rectangle and color.
-func DrawRect(r [2]orb.Point, clr color.RGBA) *ebiten.Image {
-	w, h := float32(r[1][0]-r[0][0]), float32(r[1][1]-r[0][1])
+func DrawRect(r [2][2]float32, clr color.RGBA) *ebiten.Image {
+	w, h := r[1][0]-r[0][0], r[1][1]-r[0][1]
 	img := ebiten.NewImage(int(w), int(h))
 	transparentColor := color.RGBA{R: clr.R, G: clr.G, B: clr.B, A: 128}
 	vector.DrawFilledRect(img, 0, 0, w, h, transparentColor, true)
